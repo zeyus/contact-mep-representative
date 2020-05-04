@@ -1,0 +1,15 @@
+{
+  "name": "mep-contact",
+  "version": "1.0.0",
+  "description": "Repackage XML files from european parliament",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "minimalist": "^1.0.0",
+    "xml2js": "^0.4.23"
+  }
+}

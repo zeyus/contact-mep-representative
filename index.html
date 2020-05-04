@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="x-ua-compatible" content="ie=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title></title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+    <link href="style.css" rel="stylesheet">
+  </head>
+
+  <body>
+    <div class="container">
+      <h1>Members of the European Parliament contact list</h1>
+    </div>
+    <div class="container">
+        <ul id="country-list" class="row list-unstyled">
+
+        </ul>
+    </div>
+    
+    <template id="country-template">
+        <li class="country col-md-4">
+          <div class="country-name">
+            <a class="country-link"></a>
+          </div>
+          <div class="member-list list-unstyled d-none ">
+            <h2 class="country-detail-name"></h2>
+            <div class="container">
+                <div class="member-cards card-columns">
+
+                </div>
+
+            </div>
+          </div>
+        </li>
+    </template>
+    <template id="member-template">
+        <div class="member card">
+          <div class="member-name card-header h4"></div>
+          <div class="card-body">
+          <div class="member-party"><span class="font-weight-bold">Member party: </span></div>
+          <div class="member-local-party"><span class="font-weight-bold">Local member party: </span></div>
+        </div>
+          <div class="card-footer">
+          <ul class="member-contacts list-unstyled">
+
+          </ul>
+        </div>
+    </div>
+    </template>
+    <template id="contact-template">
+        <li class="member-contact">
+            <h5>Contact details</h5>
+          <span class="contact-type font-weight-bold"></span>: 
+          <span class="contact-detail"></span>
+        </li>
+    </template>
+
+    <script lang="javascript">
+        // Adapted from: https://stackoverflow.com/questions/7949752/cross-browser-javascript-xml-parsing
+
+        var xmlhttp;
+        var members_by_country;
+        
+        if (window.XMLHttpRequest) { // code for IE7+, Firefox, Chrome, Opera, Safari
+            xmlhttp = new XMLHttpRequest();
+        }
+        else { // code for IE6, IE5
+            xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+        }
+
+        selectedCountry = window.location.hash.substr(1);
+        console.log(selectedCountry);
+
+        xmlhttp.onreadystatechange = function() {
+            if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+                members_by_country = JSON.parse(xmlhttp.responseText);
+                displayCountryList();
+            }
+        }
+        xmlhttp.open("GET", "data/members_by_country.json", true);
+        xmlhttp.send();
+
+        function displayCountryList() {
+            selectedCountry = window.location.hash.substr(1);
+            // var container = document.createElement('div');
+            // container.id = 'countryList';
+
+            var contactMap = {
+                EMA: {title: 'e-mail', transform: function(raw) { return '<a href="mailto:'+raw+'">'+raw+'<a/>'}},
+                URL: {title: 'Website', transform: function(raw) { return '<a href="'+raw+'">'+raw+'<a/>' }},
+                FBW: {title: 'Facebook', transform: function(raw) { return '<a href="'+raw+'">'+raw+'<a/>' }},
+                TWT: {title: 'Twitter', transform: function(raw) { return '<a href="'+raw+'">'+raw+'<a/>' }},
+                YTB: {title: 'Youtube', transform: function(raw) { return '<a href="'+raw+'">'+raw+'<a/>' }}
+            };
+
+            var countries = [];
+
+            for (var country in members_by_country) {
+                // skip loop if the property is from prototype
+                if (!members_by_country.hasOwnProperty(country)) continue;
+                countries.push(country);
+                var members = members_by_country[country];
+            }
+
+            countries.sort();
+
+            var countryList = document.getElementById('country-list');
+
+            countries.forEach(function(country){
+                var countryTemplate = document.getElementById('country-template').content.cloneNode(true);
+                countryTemplate.querySelector('.country-link').innerText = country;
+                countryTemplate.querySelector('.country-link').href = "#" + country;
+                countryTemplate.querySelector('.country').id='country-detail-' + country;
+                countryTemplate.querySelector('.country-detail-name').innerText = country;
+                
+                countryTemplate.querySelector('.country-link').addEventListener('click', function(evt) {
+                    
+                    var memberList = document.getElementById('member-list-' + country);
+                    var countryDetail = document.getElementById('country-detail-' + country);
+                    var isActive = countryDetail.classList.contains('expanded');
+                    var openLists = document.getElementsByClassName('current-country');
+                    for (let openList of openLists) {
+                        openList.classList.add("d-none");
+                        openList.classList.remove("current-country");
+                    }
+                    var openLists = document.getElementsByClassName('expanded');
+                    for (let openList of openLists) {
+                        openList.classList.remove("expanded");
+                        openList.classList.remove("col-md-12");
+                        openList.classList.add("col-md-4");
+                    }
+                    if( !isActive ) {
+                        memberList.classList.remove("d-none");
+                        memberList.classList.add("current-country");
+                        countryDetail.classList.add("expanded");
+                        countryDetail.classList.add("col-md-12");
+                        countryDetail.classList.remove("col-md-4");
+                    }
+            
+                    return true;
+                    // countryTemplate.querySelector('.member-list').classList.remove("d-none");
+                    // countryTemplate.querySelector('.member-list').classList.add("current-country");
+                });
+                members_by_country[country].forEach(function(member){
+                    var memberTemplate = document.getElementById('member-template').content.cloneNode(true);
+                    member.fullName.forEach(function(name) {
+                        var name_container = document.createElement('span');
+                        name_container.appendChild(document.createTextNode(name));
+                        memberTemplate.querySelector('.member-name').appendChild(name_container);
+                        
+                    });
+                    member.politicalGroup.forEach(function(name) {
+                        var name_container = document.createElement('span');
+                        name_container.appendChild(document.createTextNode(name._));
+                        memberTemplate.querySelector('.member-party').appendChild(name_container);
+                        
+                    });
+                    member.nationalPoliticalGroup.forEach(function(name) {
+                        var name_container = document.createElement('span');
+                        name_container.appendChild(document.createTextNode(name._));
+                        memberTemplate.querySelector('.member-local-party').appendChild(name_container);
+                        
+                    });
+                    if (member.hasOwnProperty('eContact')) {
+                        member.eContact.forEach(function(contact) {
+                            var contactTemplate = document.getElementById('contact-template').content.cloneNode(true);
+                            var contactType = contact.$.type;
+                            if (contactMap.hasOwnProperty(contactType)){
+                                var contactTypeTitle = contactMap[contactType].title;
+                                var contactDetail = contactMap[contactType].transform(contact._)
+                            }
+                            contactTemplate.querySelector('.contact-type').innerText = contactTypeTitle;
+                            contactTemplate.querySelector('.contact-detail').innerHTML = contactDetail;
+                            memberTemplate.querySelector('.member-contacts').appendChild(contactTemplate);
+                        });
+                    } else {
+                        console.log(member);
+                    }
+                    countryTemplate.querySelector('.member-list').id = 'member-list-' + country;
+                    countryTemplate.querySelector('.member-cards').appendChild(memberTemplate);
+                });
+                
+                if(country == selectedCountry) {
+                    countryTemplate.querySelector('.member-list').classList.remove("d-none");
+                    countryTemplate.querySelector('.member-list').classList.add("current-country");
+                    countryTemplate.querySelector('.country').classList.add('expanded');
+                    countryTemplate.querySelector('.country').classList.remove("col-md-4");
+                    countryTemplate.querySelector('.country').classList.add("col-md-12");
+                }
+                
+                
+                
+                countryList.appendChild(countryTemplate);
+                
+            });
+        }
+        
+    </script>
+  </body>
+</html>

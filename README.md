@@ -21,4 +21,9 @@ Either use the version available at: https://www.zeyus.com/contact-mep-represent
 - `http-server`
 - visit in a browser: http://localhost:8080/
 
+Optionally, the index.js script accepts the following arguements:
+- `--no-download` - skips download step
+- `--no-combine` - skip data source combination step
+- `--wait=n` - where `n` is an integer for how many milliseconds to wait between downloading each file (default `300`) 
+
 That's it, you'll see a list of countries, you can click on them and find your MEP representatives' contact details.

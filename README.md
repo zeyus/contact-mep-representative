@@ -1,7 +1,7 @@
 # contact-mep-representative
 Contact details for the Members of the European Parliament (MEPs) are painful to get from the official website, this helps
 
-You can access a version here (updated with data from 2023-03-16):
+You can access a version here (updated monthly on the 17th day of the month):
 
 https://www.zeyus.com/contact-mep-representative/
 

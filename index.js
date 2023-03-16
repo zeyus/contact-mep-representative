@@ -18,9 +18,11 @@ const wait = argv.hasOwnProperty('combine') ? argv.hasOwnProperty('combine') : 3
 
 var alphasources = [];
 
-for (let i = 'a'.charCodeAt(0); i <= 'z'.charCodeAt(0); i++) {
-    alphasources.push(['odp/detailed-list-xml/' + String.fromCharCode(i), String.fromCharCode(i) + '.xml']);
-}
+// for (let i = 'a'.charCodeAt(0); i <= 'z'.charCodeAt(0); i++) {
+//     alphasources.push(['odp/detailed-list-xml/' + String.fromCharCode(i), String.fromCharCode(i) + '.xml']);
+// }
+
+alphasources.push(['full-list/xml', 'full-list.xml']);
 
 function sleep(ms) {
     return new Promise((resolve) => {

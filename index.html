@@ -81,13 +81,19 @@
             // container.id = 'countryList';
 
             var contactMap = {
-                EMA: {title: 'Email:', transform: function(raw) { return '<a href="mailto:'+raw+'">'+raw+'<a/>'}},
-                URL: {title: 'Website:', transform: function(raw) { return '<a href="'+raw+'">'+raw+'<a/>' }},
-                FBW: {title: 'Facebook:', transform: function(raw) { return '<a href="'+raw+'">'+raw+'<a/>' }},
-                TWT: {title: 'Twitter:', transform: function(raw) { return '<a href="'+raw+'">'+raw+'<a/>' }},
-                IST: {title: 'Instagram:', transform: function(raw) { return '<a href="'+raw+'">'+raw+'<a/>' }},
-                LNK: {title: 'LinkedIn:', transform: function(raw) { return '<a href="'+raw+'">'+raw+'<a/>' }},
-                YTB: {title: 'Youtube:', transform: function(raw) { return '<a href="'+raw+'">'+raw+'<a/>' }}
+                email: {title: 'Email:', transform: function(raw) { 
+                    // replace [at] with @, [dot] with . and reverse the string
+                    var email = raw.replace(/\[at\]/g, '@').replace(/\[dot\]/g, '.').split("").reverse().join("");
+                    return '<a href="mailto:'+email+'">'+email+'</a>'}},
+                website: {title: 'Website:', transform: function(raw) { return '<a href="'+raw+'">'+raw.replace(/^https?:\/\//,'')+'</a>' }},
+                blog: {title: 'Blog:', transform: function(raw) { return '<a href="'+raw+'">'+raw.replace(/^https?:\/\//,'')+'</a>' }},
+                linkedin: {title: 'LinkedIn:', transform: function(raw) { return '<a href="'+raw+'">'+raw.replace(/\/$/, '').split("/").pop()+'</a>' }},
+                facebook: {title: 'Facebook:', transform: function(raw) { return '<a href="'+raw+'">'+raw.replace(/\/$/, '').split("/").pop()+'</a>' }},
+                twitter: {title: 'Twitter:', transform: function(raw) { return '<a href="'+raw+'">'+raw.replace(/\/$/, '').split("/").pop()+'</a>' }},
+                instagram: {title: 'Instagram:', transform: function(raw) { return '<a href="'+raw+'">'+raw.replace(/\/$/, '').split("/").pop()+'</a>' }},
+                youtube: {title: 'Youtube:', transform: function(raw) { return '<a href="'+raw+'">'+raw.replace(/\/$/, '').split("/").pop()+'</a>' }},
+                birth_date: {title: 'Birth date:', transform: function(raw) { return raw }},
+                birth_place: {title: 'Birth place:', transform: function(raw) { return raw }},
             };
 
             var countries = [];
@@ -148,32 +154,32 @@
                     });
                     member.politicalGroup.forEach(function(name) {
                         var name_container = document.createElement('span');
-                        name_container.appendChild(document.createTextNode(name._));
+                        name_container.appendChild(document.createTextNode(name));
                         memberTemplate.querySelector('.member-party').appendChild(name_container);
                         
                     });
                     member.nationalPoliticalGroup.forEach(function(name) {
                         var name_container = document.createElement('span');
-                        name_container.appendChild(document.createTextNode(name._));
+                        name_container.appendChild(document.createTextNode(name));
                         memberTemplate.querySelector('.member-local-party').appendChild(name_container);
                         
                     });
                     
-                    if (member.hasOwnProperty('eContact')) {
-                        member.eContact.forEach(function(contact) {
+                    if (member.hasOwnProperty('contact_data')) {
+                        for (const [contactType, contactItem] of Object.entries(member.contact_data)) {
                             var contactTemplate = document.getElementById('contact-template').content.cloneNode(true);
-                            var contactType = contact.$.type;
                             if (contactMap.hasOwnProperty(contactType)){
                                 var contactTypeTitle = contactMap[contactType].title;
-                                var contactDetail = contactMap[contactType].transform(contact._)
+                                var contactDetail = contactMap[contactType].transform(contactItem)
                             } else { 
                                 var contactTypeTitle = contactType;
-                                var contactDetail = contact._;
+                                var contactDetail = contactItem;
                             }
                             contactTemplate.querySelector('.contact-type').innerText = contactTypeTitle;
                             contactTemplate.querySelector('.contact-detail').innerHTML = contactDetail;
                             memberTemplate.querySelector('.member-contacts').appendChild(contactTemplate);
-                        });
+                        }
+
                     } else {
                         // no eContact??
                     }
@@ -182,7 +188,7 @@
                             if (contact.hasOwnProperty('phone')) {
                                 contact.phone.forEach(function(phone){
                                     var contactTemplate = document.getElementById('contact-template').content.cloneNode(true);
-                                    contactTemplate.querySelector('.contact-type').innerText = 'Phone (' + contact.town[0]._ + ', ' + contact.country[0]._ + ')';
+                                    contactTemplate.querySelector('.contact-type').innerText = 'Phone (' + contact.town[0] + ', ' + contact.country[0] + ')';
                                     contactTemplate.querySelector('.contact-detail').innerText = phone;
                                     memberTemplate.querySelector('.member-contacts').appendChild(contactTemplate);
                                 });

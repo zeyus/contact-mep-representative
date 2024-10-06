@@ -31,21 +31,25 @@
             <div class="member-list list-unstyled d-none ">
                 <h2 class="country-detail-name"></h2>
                 <div
-                    class="container row row-cols-1 row-cols-sm-1 row-cols-md-1 row-cols-lg-2 row-cols-xl-3 row-cols-xxl-4 member-cards card-columns">
+                    class="container row row-cols-1 row-cols-sm-1 row-cols-md-1 row-cols-lg-2 row-cols-xl-2 row-cols-xxl-3 member-cards card-columns">
 
                 </div>
             </div>
         </li>
     </template>
     <template id="member-template">
-        <div class="member card col m-1 p-0">
+        <div class="member card col m-1 p-0 mb-4">
+            <div class="card-header">
+                <h5 class="text-center member-name"></h5>
+            </div>
             <div class="card-body">
-                <h5 class="text-center card-title member-name mb-4"></h5>
-                <div class="member-party mb-3">
-                    <div class="fw-bold text-center">Member party</div>
+                <div class="member-party mb-3 row">
+                    <div class="fw-bold col-4">Party</div>
                 </div>
-                <div class="member-local-party">
-                    <div class="fw-bold text-center">Local member party</div>
+
+
+                <div class="member-local-party row">
+                    <div class="fw-bold col-4">Local party</div>
                 </div>
             </div>
             <div class="card-footer mt-4">
@@ -82,6 +86,19 @@
         xmlhttp.open("GET", "data/members_by_country.json", true);
         xmlhttp.send();
 
+        function wrangleURI(url) {
+            // also strip query string, hash and trailing slashes
+            url = url.split(/[?#]/)[0].replace(/\/+$/, '');
+            if (!url.match(/^https?:\/\//)) {
+                url = 'https://' + url;
+            }
+            // trim trailing whitespace
+            url = url.trim();
+            // remove trailing slashes (again, there are some weird cases)
+            url = url.replace(/\/+$/, '');
+            return URL.parse(url);
+        }
+
         function displayCountryList() {
             selectedCountry = window.location.hash.substr(1);
             // var container = document.createElement('div');
@@ -114,39 +131,44 @@
                     icon: 'linkedin',
                     title: 'LinkedIn',
                     transform: function (raw) {
-                        return '<a href="' + raw + '">' + raw.replace(/\/$/, '').split("/").pop() + '</a>';
+                        const url = wrangleURI(raw);
+                        return '<a href="' + raw + '">' + url.pathname.split("/").pop() + '</a>';
                     }
                 },
                 facebook: { 
                     icon: 'facebook',
                     title: 'Facebook',
                     transform: function (raw) {
-                        return '<a href="' + raw + '">' + raw.replace(/\/$/, '').split("/").pop() + '</a>';
+                        const url = wrangleURI(raw);
+                        return '<a href="' + raw + '">' + url.pathname.split("/").pop() + '</a>';
                     }
                 },
                 twitter: {
                     icon: 'twitter-x',
                     title: 'X',
                     transform: function (raw) { 
-                        return '<a href="' + raw + '">' + raw.replace(/\/$/, '').split("/").pop() + '</a>';
+                        const url = wrangleURI(raw);
+                        return '<a href="' + raw + '">' + url.pathname.split("/").pop() + '</a>';
                     }
                 },
                 instagram: {
                     icon: 'instagram',
                     title: 'Instagram',
                     transform: function (raw) {
-                        return '<a href="' + raw + '">' + raw.replace(/\/$/, '').split("/").pop() + '</a>';
+                        const url = wrangleURI(raw);
+                        return '<a href="' + raw + '">' + url.pathname.split("/").pop() + '</a>';
                     }
                 },
                 youtube: {
                     icon: 'youtube',
                     title: 'Youtube',
                     transform: function (raw) {
-                        return '<a href="' + raw + '">' + raw.replace(/\/$/, '').split("/").pop() + '</a>';
+                        const url = wrangleURI(raw);
+                        return '<a href="' + raw + '">' + url.pathname.split("/").pop() + '</a>';
                     }
                 },
                 birth_date: {
-                    icon: 'calendar',
+                    icon: 'cake2',
                     title: 'Birth date',
                     transform: function (raw) {
                         // attempt to parse the date
@@ -232,8 +254,9 @@
 
                     if (member.hasOwnProperty('politicalGroup')) {
                         member.politicalGroup.forEach(function (name) {
-                            var name_container = document.createElement('span');
+                            var name_container = document.createElement('div');
                             name_container.appendChild(document.createTextNode(name));
+                            name_container.classList.add('col-8');
                             memberTemplate.querySelector('.member-party').appendChild(name_container);
 
                         });
@@ -241,7 +264,9 @@
 
                     if (member.hasOwnProperty('nationalPoliticalGroup')) {
                         member.nationalPoliticalGroup.forEach(function (name) {
-                            var name_container = document.createElement('span');
+                            var name_container = document.createElement('div');
+                            // add col-9 class
+                            name_container.classList.add('col-8');
                             name_container.appendChild(document.createTextNode(name));
                             memberTemplate.querySelector('.member-local-party').appendChild(name_container);
 

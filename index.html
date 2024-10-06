@@ -88,15 +88,19 @@
 
         function wrangleURI(url) {
             // also strip query string, hash and trailing slashes
-            url = url.split(/[?#]/)[0].replace(/\/+$/, '');
-            if (!url.match(/^https?:\/\//)) {
-                url = 'https://' + url;
+            var fixedurl = url.split(/[?#]/)[0].replace(/\/+$/, '');
+            if (!fixedurl.match(/^https?:\/\//)) {
+                fixedurl = 'https://' + fixedurl;
             }
             // trim trailing whitespace
-            url = url.trim();
+            fixedurl = fixedurl.trim();
             // remove trailing slashes (again, there are some weird cases)
-            url = url.replace(/\/+$/, '');
-            return URL.parse(url);
+            fixedurl = fixedurl.replace(/\/+$/, '');
+            const parsed = URL.parse(fixedurl);
+            if (parsed === null) {
+                return url;
+            }
+            return decodeURI(parsed.pathname.split("/").pop())
         }
 
         function displayCountryList() {
@@ -131,40 +135,40 @@
                     icon: 'linkedin',
                     title: 'LinkedIn',
                     transform: function (raw) {
-                        const url = wrangleURI(raw);
-                        return '<a href="' + raw + '">' + url.pathname.split("/").pop() + '</a>';
+                        const username = wrangleURI(raw);
+                        return '<a href="' + raw + '">' + username + '</a>';
                     }
                 },
                 facebook: { 
                     icon: 'facebook',
                     title: 'Facebook',
                     transform: function (raw) {
-                        const url = wrangleURI(raw);
-                        return '<a href="' + raw + '">' + url.pathname.split("/").pop() + '</a>';
+                        const username = wrangleURI(raw);
+                        return '<a href="' + raw + '">' + username + '</a>';
                     }
                 },
                 twitter: {
                     icon: 'twitter-x',
                     title: 'X',
                     transform: function (raw) { 
-                        const url = wrangleURI(raw);
-                        return '<a href="' + raw + '">' + url.pathname.split("/").pop() + '</a>';
+                        const username = wrangleURI(raw);
+                        return '<a href="' + raw + '">' + username + '</a>';
                     }
                 },
                 instagram: {
                     icon: 'instagram',
                     title: 'Instagram',
                     transform: function (raw) {
-                        const url = wrangleURI(raw);
-                        return '<a href="' + raw + '">' + url.pathname.split("/").pop() + '</a>';
+                        const username = wrangleURI(raw);
+                        return '<a href="' + raw + '">' + username + '</a>';
                     }
                 },
                 youtube: {
                     icon: 'youtube',
                     title: 'Youtube',
                     transform: function (raw) {
-                        const url = wrangleURI(raw);
-                        return '<a href="' + raw + '">' + url.pathname.split("/").pop() + '</a>';
+                        const username = wrangleURI(raw);
+                        return '<a href="' + raw + '">' + username + '</a>';
                     }
                 },
                 birth_date: {

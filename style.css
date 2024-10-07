@@ -1,0 +1,15 @@
+svg.bi {
+    height: 1em;
+    width: 1em;
+    color: #fff;
+    fill: #fff;
+}
+
+html[data-bs-theme="light"] .dropdown-item > svg.bi {
+    color: #333;
+    fill: #333;
+}
+html[data-bs-theme="dark"] .dropdown-item > svg.bi {
+    color: #ccc;
+    fill: #ccc;
+}

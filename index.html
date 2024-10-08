@@ -12,7 +12,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link href="flag-icons.min.css" rel="stylesheet">
     <link href="style.css" rel="stylesheet">
-    <script>
+    <script lang="javascript">
         /*!
         * Color mode toggler for Bootstrap's docs (https://getbootstrap.com/)
         * Copyright 2011-2024 The Bootstrap Authors
@@ -136,6 +136,13 @@
         </div>
     </div>
     <div class="container">
+        <div class="row my-4">
+            <div class="alert alert-secondary" id="update-metadata" role="alert">
+
+            </div>
+        </div>
+    </div>
+    <div class="container">
         <div class="accordion" id="country-list">
 
         </div>
@@ -151,14 +158,14 @@
             <div class="member-list list-unstyled accordion-collapse collapse" id="" ata-bs-parent="">
                 <!-- <h2 class="country-detail-name"></h2> -->
                 <div
-                    class="accordion-body container row row-cols-1 row-cols-sm-1 row-cols-md-1 row-cols-lg-2 row-cols-xl-2 row-cols-xxl-3 member-cards card-columns">
+                    class="accordion-body container row row-cols-1 row-cols-sm-1 row-cols-md-1 row-cols-lg-2 member-cards mx-1 px-0 pe-2 mx-lg-2 ps-lg-2 card-columns">
 
                 </div>
             </div>
         </div>
     </template>
     <template id="member-template">
-        <div class="member card col m-1 p-0 mb-4">
+        <div class="member card col ms-lg-1 px-0 mb-4">
             <div class="card-header">
                 <h5 class="text-center member-name"></h5>
             </div>
@@ -195,7 +202,9 @@
         crossorigin="anonymous"></script>
     <script lang="javascript">
         var members_by_country;
-        var xmlhttp = new XMLHttpRequest();
+        
+        selectedCountry = window.location.hash.substr(1);
+        console.log(selectedCountry);
 
         function iso_country_code(countryName) {
             const countries = {
@@ -383,18 +392,40 @@
             return countries[normalizedCountry] || "xx";
         }
 
+        function updateMetadata() {
+            const updateMetadata = document.getElementById('update-metadata');
+            // load metadata from data/metadata.json
+            const xmlhttpMetadata = new XMLHttpRequest();
+            // update fields:
+            // "countries" (int)
+            // "meps" (int)
+            // "last_update" (iso date)
+            // "errors" (int)
 
-        selectedCountry = window.location.hash.substr(1);
-        console.log(selectedCountry);
-
-        xmlhttp.onreadystatechange = function () {
-            if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
-                members_by_country = JSON.parse(xmlhttp.responseText);
-                displayCountryList();
+            xmlhttpMetadata.onreadystatechange = function () {
+                if (xmlhttpMetadata.readyState == 4 && xmlhttpMetadata.status == 200) {
+                    metadata = JSON.parse(xmlhttpMetadata.responseText);
+                    const updatedDate = new Date(metadata.last_update);
+                    const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric', timeZoneName: 'short' };
+                    updateMetadata.innerHTML = 'Updated ' + updatedDate.toLocaleDateString('en-GB', options) + ' with ' + metadata.meps + ' MEPs from ' + metadata.countries + ' countries. ' + metadata.errors + ' errors.';
+                }
             }
+            xmlhttpMetadata.open("GET", "data/metadata.json", true);
+            xmlhttpMetadata.send();
         }
-        xmlhttp.open("GET", "data/members_by_country.json", true);
-        xmlhttp.send();
+
+        function updateMemberList() {
+            const xmlhttp = new XMLHttpRequest();
+            xmlhttp.onreadystatechange = function () {
+                if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+                    members_by_country = JSON.parse(xmlhttp.responseText);
+                    displayCountryList();
+                }
+            }
+            xmlhttp.open("GET", "data/members_by_country.json", true);
+            xmlhttp.send();
+        }
+
 
         function wrangleURI(url) {
             // also strip query string, hash and trailing slashes
@@ -638,6 +669,11 @@
             });
         }
 
+        // add domcontentloaded event listener
+        document.addEventListener('DOMContentLoaded', function () {
+            updateMetadata();
+            updateMemberList();
+        });
         
     </script>
 </body>

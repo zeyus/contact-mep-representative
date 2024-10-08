@@ -158,6 +158,7 @@ async function combine_data_files() {
     var num_meps = 0;
     var major_error = false;
     var error_count = 0;
+    var source_errors = [];
     alphasources.forEach(function (source) {
         let xml_string = fs.readFileSync(data_path + source[1], "utf8");
         parser.parseString(xml_string, function (error, result) {
@@ -182,6 +183,7 @@ async function combine_data_files() {
                 major_error = true;
                 error_count++;
                 console.log(error);
+                source_errors.push(source[1]);
             }
             console.log('Found ' + num_meps + ' MEPs');
         });
@@ -190,6 +192,7 @@ async function combine_data_files() {
     // we need to get the contact data for each MEP
     // and add it to the list
     var processed = 0;
+    var mep_errors = [];
     for (let country in members_by_country) {
         let meps = members_by_country[country];
         for (let i = 0; i < meps.length; i++) {
@@ -202,6 +205,7 @@ async function combine_data_files() {
                 console.log('Processed ' + processed + '/' + num_meps + ' MEPs');
             } else {
                 error_count++;
+                mep_errors.push(mep_id);
                 console.log('Error processing MEP ' + mep_id);
             }
             await sleep(wait);
@@ -214,6 +218,19 @@ async function combine_data_files() {
     let dest = fs.createWriteStream(data_path + combined_source);
     dest.write(JSON.stringify(members_by_country));
     dest.close();
+    // make a metadata file with number of countries, MEPs last update date and any errors
+    let metadata = {
+        countries: Object.keys(members_by_country).length,
+        meps: num_meps,
+        last_update: new Date().toISOString(),
+        errors: error_count,
+        error_list: mep_errors,
+        source_errors: source_errors
+    };
+    console.log('Saving metadata to ' + data_path + 'metadata.json');
+    let meta_dest = fs.createWriteStream(data_path + 'metadata.json');
+    meta_dest.write(JSON.stringify(metadata));
+    meta_dest.close();
 }
 
 

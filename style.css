@@ -13,3 +13,16 @@ html[data-bs-theme="dark"] .dropdown-item > svg.bi {
     color: #ccc;
     fill: #ccc;
 }
+
+
+/* member contact detail cards, make width 100% */
+.member-cards > .member {
+    width: 100%;
+}
+
+/* member contact detail cards, make width 50% - margin (1) */
+@media (min-width: 992px) {
+    .member-cards > .member {
+        width: calc(50% - 1rem);
+    }
+}

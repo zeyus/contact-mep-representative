@@ -465,7 +465,11 @@
             if (parsed === null) {
                 return url;
             }
-            return decodeURI(parsed.pathname.split("/").pop())
+            const decoded = decodeURI(parsed.pathname.split("/").pop().trim());
+            if (decoded === null || decoded === "") {
+                return url;
+            }
+            return decoded;
         }
 
         // Function to create contact details

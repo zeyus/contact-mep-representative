@@ -20,152 +20,172 @@
         */
 
         (() => {
-        'use strict'
+            'use strict'
 
-        const getStoredTheme = () => localStorage.getItem('theme')
-        const setStoredTheme = theme => localStorage.setItem('theme', theme)
+            const getStoredTheme = () => localStorage.getItem('theme')
+            const setStoredTheme = theme => localStorage.setItem('theme', theme)
 
-        const getPreferredTheme = () => {
-            const storedTheme = getStoredTheme()
-            if (storedTheme) {
-            return storedTheme
+            const getPreferredTheme = () => {
+                const storedTheme = getStoredTheme()
+                if (storedTheme) {
+                    return storedTheme
+                }
+
+                return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
             }
 
-            return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
-        }
-
-        const setTheme = theme => {
-            if (theme === 'auto') {
-                document.documentElement.setAttribute('data-bs-theme', (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'))
-            } else {
-                document.documentElement.setAttribute('data-bs-theme', theme)
-            }
-        }
-
-        setTheme(getPreferredTheme())
-
-        const showActiveTheme = (theme, focus = false) => {
-            const themeSwitcher = document.querySelector('#bd-theme')
-
-            if (!themeSwitcher) {
-                return
+            const setTheme = theme => {
+                if (theme === 'auto') {
+                    document.documentElement.setAttribute('data-bs-theme', (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'))
+                } else {
+                    document.documentElement.setAttribute('data-bs-theme', theme)
+                }
             }
 
-            const themeSwitcherText = document.querySelector('#bd-theme-text')
-            const activeThemeIcon = document.querySelector('.theme-icon-active use')
-            const btnToActive = document.querySelector(`[data-bs-theme-value="${theme}"]`)
-            const svgOfActiveBtn = btnToActive.querySelector('svg use').getAttribute('href')
-
-            document.querySelectorAll('[data-bs-theme-value]').forEach(element => {
-            element.classList.remove('active')
-            element.setAttribute('aria-pressed', 'false')
-            })
-
-            btnToActive.classList.add('active')
-            btnToActive.setAttribute('aria-pressed', 'true')
-            activeThemeIcon.setAttribute('href', svgOfActiveBtn)
-            const themeSwitcherLabel = `${themeSwitcherText.textContent} (${btnToActive.dataset.bsThemeValue})`
-            themeSwitcher.setAttribute('aria-label', themeSwitcherLabel)
-
-            if (focus) {
-            themeSwitcher.focus()
-            }
-        }
-
-        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
-            const storedTheme = getStoredTheme()
-            if (storedTheme !== 'light' && storedTheme !== 'dark') {
             setTheme(getPreferredTheme())
-            }
-        })
 
-        window.addEventListener('DOMContentLoaded', () => {
-            showActiveTheme(getPreferredTheme())
+            const showActiveTheme = (theme, focus = false) => {
+                const themeSwitcher = document.querySelector('#bd-theme')
 
-            document.querySelectorAll('[data-bs-theme-value]')
-            .forEach(toggle => {
-                toggle.addEventListener('click', () => {
-                const theme = toggle.getAttribute('data-bs-theme-value')
-                setStoredTheme(theme)
-                setTheme(theme)
-                showActiveTheme(theme, true)
+                if (!themeSwitcher) {
+                    return
+                }
+
+                const themeSwitcherText = document.querySelector('#bd-theme-text')
+                const activeThemeIcon = document.querySelector('.theme-icon-active use')
+                const btnToActive = document.querySelector(`[data-bs-theme-value="${theme}"]`)
+                const svgOfActiveBtn = btnToActive.querySelector('svg use').getAttribute('href')
+
+                document.querySelectorAll('[data-bs-theme-value]').forEach(element => {
+                    element.classList.remove('active')
+                    element.setAttribute('aria-pressed', 'false')
                 })
+
+                btnToActive.classList.add('active')
+                btnToActive.setAttribute('aria-pressed', 'true')
+                activeThemeIcon.setAttribute('href', svgOfActiveBtn)
+                const themeSwitcherLabel = `${themeSwitcherText.textContent} (${btnToActive.dataset.bsThemeValue})`
+                themeSwitcher.setAttribute('aria-label', themeSwitcherLabel)
+
+                if (focus) {
+                    themeSwitcher.focus()
+                }
+            }
+
+            window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+                const storedTheme = getStoredTheme()
+                if (storedTheme !== 'light' && storedTheme !== 'dark') {
+                    setTheme(getPreferredTheme())
+                }
             })
-        })
+
+            window.addEventListener('DOMContentLoaded', () => {
+                showActiveTheme(getPreferredTheme())
+
+                document.querySelectorAll('[data-bs-theme-value]')
+                    .forEach(toggle => {
+                        toggle.addEventListener('click', () => {
+                            const theme = toggle.getAttribute('data-bs-theme-value')
+                            setStoredTheme(theme)
+                            setTheme(theme)
+                            showActiveTheme(theme, true)
+                        })
+                    })
+            })
         })();
     </script>
 </head>
 
 <body>
-    <div class="container">
-        <div class="row my-4">
+    <!-- Header section -->
+    <header class="container my-4">
+        <div class="row align-items-center">
             <div class="col-8">
                 <h1>Members of the European Parliament</h1>
             </div>
             <div class="col-4 text-end">
                 <div class="btn-group">
-                    <button class="btn btn-secondary dropdown-toggle show" id="bd-theme" type="button" aria-expanded="true" data-bs-toggle="dropdown" data-bs-display="static" aria-label="Toggle theme">
-                    <svg class="bi my-1 theme-icon-active"><use href="bootstrap-icons.svg#sun-fill"></use></svg>
-                    <span class="ms-2" id="bd-theme-text">Toggle theme</span>
+                    <button class="btn btn-secondary dropdown-toggle show" id="bd-theme" type="button"
+                        aria-expanded="true" data-bs-toggle="dropdown" data-bs-display="static"
+                        aria-label="Toggle theme">
+                        <svg class="bi my-1 theme-icon-active">
+                            <use href="bootstrap-icons.svg#sun-fill"></use>
+                        </svg>
+                        <span class="ms-2" id="bd-theme-text">Toggle theme</span>
                     </button>
                     <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="bd-theme-text" data-bs-popper="static">
-                    <li>
-                        <button type="button" class="dropdown-item" data-bs-theme-value="light" aria-pressed="true">
-                        <svg class="bi me-2 opacity-50"><use href="bootstrap-icons.svg#sun-fill"></use></svg>
-                        Light
-                        <svg class="bi d-none"><use href="#check2"></use></svg>
-                        </button>
-                    </li>
-                    <li>
-                        <button type="button" class="dropdown-item" data-bs-theme-value="dark" aria-pressed="false">
-                        <svg class="bi me-2 opacity-50"><use href="bootstrap-icons.svg#moon-stars-fill"></use></svg>
-                        Dark
-                        <svg class="bi d-none"><use href="#check2"></use></svg>
-                        </button>
-                    </li>
-                    <li>
-                        <button type="button" class="dropdown-item" data-bs-theme-value="auto" aria-pressed="false">
-                        <svg class="bi me-2 opacity-50"><use href="bootstrap-icons.svg#circle-half"></use></svg>
-                        Auto
-                        <svg class="bi d-none"><use href="#check2"></use></svg>
-                        </button>
-                    </li>
+                        <li>
+                            <button type="button" class="dropdown-item" data-bs-theme-value="light" aria-pressed="true">
+                                <svg class="bi me-2 opacity-50">
+                                    <use href="bootstrap-icons.svg#sun-fill"></use>
+                                </svg>
+                                Light
+                                <svg class="bi d-none">
+                                    <use href="#check2"></use>
+                                </svg>
+                            </button>
+                        </li>
+                        <li>
+                            <button type="button" class="dropdown-item" data-bs-theme-value="dark" aria-pressed="false">
+                                <svg class="bi me-2 opacity-50">
+                                    <use href="bootstrap-icons.svg#moon-stars-fill"></use>
+                                </svg>
+                                Dark
+                                <svg class="bi d-none">
+                                    <use href="#check2"></use>
+                                </svg>
+                            </button>
+                        </li>
+                        <li>
+                            <button type="button" class="dropdown-item" data-bs-theme-value="auto" aria-pressed="false">
+                                <svg class="bi me-2 opacity-50">
+                                    <use href="bootstrap-icons.svg#circle-half"></use>
+                                </svg>
+                                Auto
+                                <svg class="bi d-none">
+                                    <use href="#check2"></use>
+                                </svg>
+                            </button>
+                        </li>
                     </ul>
                 </div>
             </div>
         </div>
-    </div>
-    <div class="container">
-        <div class="row my-4">
-            <div class="alert alert-secondary" id="update-metadata" role="alert">
+    </header>
 
-            </div>
-        </div>
-    </div>
-    <div class="container">
-        <div class="accordion" id="country-list">
-
+    <!-- Metadata update alert -->
+    <div class="container my-4">
+        <div class="row">
+            <div class="alert alert-secondary" id="update-metadata" role="alert"></div>
         </div>
     </div>
 
+    <!-- Country List Accordion -->
+    <div class="container">
+        <div class="accordion" id="country-list"></div>
+    </div>
+
+
+    <!-- Templates for rendering dynamic content -->
     <template id="country-template">
-        <div class="country accordion-item">
+        <div class="accordion-item country">
             <h2 class="accordion-header">
-                <button class="accordion-button collapsed country-name" type="button" data-bs-toggle="collapse" data-bs-target="" aria-expanded="false" aria-controls="">
-                    <div class="country-flag me-2"></div><div class="country-link"></div>
+                <button class="accordion-button collapsed country-name" type="button" data-bs-toggle="collapse">
+                    <div class="country-flag me-2"></div>
+                    <div class="country-link"></div>
                 </button>
             </h2>
-            <div class="member-list list-unstyled accordion-collapse collapse" id="" ata-bs-parent="">
-                <!-- <h2 class="country-detail-name"></h2> -->
+            <div class="accordion-collapse collapse member-list">
                 <div
-                    class="accordion-body container row row-cols-1 row-cols-sm-1 row-cols-md-1 row-cols-lg-2 member-cards mx-1 px-0 pe-2 mx-lg-2 ps-lg-2 card-columns">
+                    class="accordion-body row row-cols-1 row-cols-sm-1 row-cols-md-1 row-cols-lg-2 member-cards mx-1 px-0 pe-2 mx-lg-2 ps-lg-3 card-columns">
 
                 </div>
             </div>
         </div>
     </template>
+
     <template id="member-template">
-        <div class="member card col ms-lg-1 px-0 mb-4">
+        <div class="member card col ms-1 ms-lg-2 px-0 mb-4">
             <div class="card-header">
                 <h5 class="text-center member-name"></h5>
             </div>
@@ -181,9 +201,7 @@
             </div>
             <div class="card-footer mt-4">
                 <h5 class="text-center">Contact details</h5>
-                <ul class="member-contacts list-unstyled">
-
-                </ul>
+                <ul class="member-contacts list-unstyled"></ul>
             </div>
         </div>
     </template>
@@ -194,19 +212,36 @@
         </li>
     </template>
 
-    <div class="container mt-5 mb-5">
-        Member list generated from <a href="https://github.com/zeyus/contact-mep-representative">contact-mep-representative</a> by <a href="https://github.com/zeyus/">zeyus</a>. Member contact collation and presentation tool licenced under the <a href="https://github.com/zeyus/contact-mep-representative/blob/master/LICENSE">MIT License</a>.
-    </div>
+    <!-- Footer Section -->
+    <footer class="container mt-5 mb-5 text-center">
+        Member list generated from <a
+            href="https://github.com/zeyus/contact-mep-representative">contact-mep-representative</a> by <a
+            href="https://github.com/zeyus/">zeyus</a>. Member contact collation and presentation tool licenced under
+        the <a href="https://github.com/zeyus/contact-mep-representative/blob/master/LICENSE">MIT License</a>.
+    </footer>
+
+    <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
         crossorigin="anonymous"></script>
-    <script lang="javascript">
-        var members_by_country;
-        
-        selectedCountry = window.location.hash.substr(1);
-        console.log(selectedCountry);
 
-        function iso_country_code(countryName) {
+    <!-- Content script (load JSON, populate member info) -->
+    <script lang="javascript">
+        var membersByCountry;
+
+        // Reusable function to fetch JSON data
+        async function fetchJson(url) {
+            try {
+                const response = await fetch(url);
+                if (!response.ok) throw new Error(`Failed to fetch ${url}: ${response.statusText}`);
+                return await response.json();
+            } catch (error) {
+                console.error(error);
+                return null;
+            }
+        }
+
+        function isoCountryCode(countryName) {
             const countries = {
                 "afghanistan": "af",
                 "albania": "al",
@@ -392,44 +427,33 @@
             return countries[normalizedCountry] || "xx";
         }
 
-        function updateMetadata() {
-            const updateMetadata = document.getElementById('update-metadata');
-            // load metadata from data/metadata.json
-            const xmlhttpMetadata = new XMLHttpRequest();
-            // update fields:
-            // "countries" (int)
-            // "meps" (int)
-            // "last_update" (iso date)
-            // "errors" (int)
+        // Function to update metadata
+        async function updateMetadata() {
+            const metadata = await fetchJson('data/metadata.json');
+            if (!metadata) return;
 
-            xmlhttpMetadata.onreadystatechange = function () {
-                if (xmlhttpMetadata.readyState == 4 && xmlhttpMetadata.status == 200) {
-                    metadata = JSON.parse(xmlhttpMetadata.responseText);
-                    const updatedDate = new Date(metadata.last_update);
-                    const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric', timeZoneName: 'short' };
-                    updateMetadata.innerHTML = 'Updated ' + updatedDate.toLocaleDateString('en-GB', options) + ' with ' + metadata.meps + ' MEPs from ' + metadata.countries + ' countries. ' + metadata.errors + ' errors.';
-                }
-            }
-            xmlhttpMetadata.open("GET", "data/metadata.json", true);
-            xmlhttpMetadata.send();
+            const updateMetadataElem = document.getElementById('update-metadata');
+            const updatedDate = new Date(metadata.last_update);
+            const options = {
+                weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
+                hour: 'numeric', minute: 'numeric', second: 'numeric', timeZoneName: 'short'
+            };
+            updateMetadataElem.innerHTML = `Updated ${updatedDate.toLocaleDateString('en-GB', options)} with ${metadata.meps} MEPs from ${metadata.countries} countries. ${metadata.errors} errors.`;
+            // append last update date to title
+            document.title += ` (Updated ${updatedDate.toLocaleDateString('en-GB', options)})`;
         }
 
-        function updateMemberList() {
-            const xmlhttp = new XMLHttpRequest();
-            xmlhttp.onreadystatechange = function () {
-                if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
-                    members_by_country = JSON.parse(xmlhttp.responseText);
-                    displayCountryList();
-                }
-            }
-            xmlhttp.open("GET", "data/members_by_country.json", true);
-            xmlhttp.send();
+        // Function to update member list
+        async function updateMemberList() {
+            const membersByCountry = await fetchJson('data/members_by_country.json');
+            if (!membersByCountry) return;
+            displayCountryList(membersByCountry);
         }
 
-
+        // Function to wrangle URI
         function wrangleURI(url) {
             // also strip query string, hash and trailing slashes
-            var fixedurl = url.split(/[?#]/)[0].replace(/\/+$/, '');
+            var fixedurl = url.replace(/\/([\#\?][^\/]+?)$/, '');
             if (!fixedurl.match(/^https?:\/\//)) {
                 fixedurl = 'https://' + fixedurl;
             }
@@ -444,12 +468,9 @@
             return decodeURI(parsed.pathname.split("/").pop())
         }
 
-        function displayCountryList() {
-            selectedCountry = window.location.hash.substr(1);
-            // var container = document.createElement('div');
-            // container.id = 'countryList';
-
-            var contactMap = {
+        // Function to create contact details
+        function createContactDetail(contactType, contactItem) {
+            const contactMap = {
                 email: {
                     icon: 'envelope-at',
                     title: 'Email', transform: function (raw) {
@@ -465,14 +486,14 @@
                         return '<a href="' + raw + '">' + raw.replace(/^https?:\/\//, '') + '</a>';
                     }
                 },
-                blog: { 
+                blog: {
                     icon: 'journal',
                     title: 'Blog',
                     transform: function (raw) {
                         return '<a href="' + raw + '">' + raw.replace(/^https?:\/\//, '') + '</a>';
                     }
                 },
-                linkedin: { 
+                linkedin: {
                     icon: 'linkedin',
                     title: 'LinkedIn',
                     transform: function (raw) {
@@ -480,7 +501,7 @@
                         return '<a href="' + raw + '">' + username + '</a>';
                     }
                 },
-                facebook: { 
+                facebook: {
                     icon: 'facebook',
                     title: 'Facebook',
                     transform: function (raw) {
@@ -491,7 +512,7 @@
                 twitter: {
                     icon: 'twitter-x',
                     title: 'X',
-                    transform: function (raw) { 
+                    transform: function (raw) {
                         const username = wrangleURI(raw);
                         return '<a href="' + raw + '">' + username + '</a>';
                     }
@@ -537,68 +558,55 @@
                 },
             };
 
-            var countries = [];
+            const { icon, transform } = contactMap[contactType] || { icon: 'question', transform: () => contactItem };
+            return { icon, detail: transform(contactItem) };
+        }
 
-            for (var country in members_by_country) {
-                // skip loop if the property is from prototype
-                if (!members_by_country.hasOwnProperty(country)) continue;
-                countries.push(country);
-                var members = members_by_country[country];
-            }
+        function displayCountryList(membersByCountry) {
+            const countryListEl = document.getElementById('country-list');
+            const countries = Object.keys(membersByCountry).sort();
 
-            countries.sort();
-
-            var countryList = document.getElementById('country-list');
 
             countries.forEach(function (country) {
-                var countryTemplate = document.getElementById('country-template').content.cloneNode(true);
-                const safe_country = country.replace(/ /g, '-');
-                const hash_match = window.location.hash.substr(1) == safe_country;
+
+                const countryTemplate = document.getElementById('country-template').content.cloneNode(true);
+                const safeCountry = country.replace(/ /g, '-');
+                const isHashMatch = window.location.hash.substr(1) == safeCountry;
+
                 // add flag to start of .country-name div
-                const country_code = iso_country_code(country);
-                const flag = countryTemplate.querySelector('.country-flag');
-                flag.classList.add('fi', 'fi-' + country_code);
-                
+                const country_code = isoCountryCode(country);
+                countryTemplate.querySelector('.country-flag').classList.add('fi', 'fi-' + country_code);
+
                 countryTemplate.querySelector('.country-link').innerText = country;
-                countryTemplate.querySelector('.country').id = 'country-detail-' + country;
-                // countryTemplate.querySelector('.country-detail-name').innerText = country;
+                countryTemplate.querySelector('.country').id = safeCountry;
+
                 // Add ID, data-bs-target and aria-controls to the button and collapse div
-                countryTemplate.querySelector('.accordion-button').dataset.bsTarget = '#member-list-' + safe_country;
-                countryTemplate.querySelector('.accordion-button').setAttribute('aria-controls', 'member-list-' + safe_country);
-                countryTemplate.querySelector('.accordion-button').setAttribute('aria-expanded', hash_match);
+                const accordionButton = countryTemplate.querySelector('.accordion-button');
+                accordionButton.dataset.bsTarget = `#member-list-${safeCountry}`;
+                accordionButton.setAttribute('aria-controls', `member-list-${safeCountry}`);
+                accordionButton.setAttribute('aria-expanded', isHashMatch);
                 // remove 'collapsed' class if hash matches country
-                if (hash_match) {
-                    countryTemplate.querySelector('.accordion-button').classList.remove('collapsed');
-                }
+                if (isHashMatch) accordionButton.classList.remove('collapsed');
 
-                countryTemplate.querySelector('.member-list').id = 'member-list-' + safe_country;
-                countryTemplate.querySelector('.member-list').dataset.bsParent = '#country-list';
-                countryTemplate.querySelector('.member-list').setAttribute('aria-labelledby', 'country-detail-' + safe_country);
-                countryTemplate.querySelector('.member-list').setAttribute('aria-expanded', hash_match);
-                // add .show class if hash matches country
-                if (hash_match) {
-                    countryTemplate.querySelector('.member-list').classList.add('show');
-                }
-                
-                // Add event listeniner for 'hidden.bs.collapse' to add hash to URL / select current country if matching
-                countryTemplate.querySelector('.member-list').addEventListener('hidden.bs.collapse', function () {
-                    // if hash is matching the country, remove it
-                    if (window.location.hash.substr(1) == safe_country) {
-                        window.location.hash = '';
+                const memberListElem = countryTemplate.querySelector('.member-list');
+                memberListElem.id = `member-list-${safeCountry}`;
+                memberListElem.dataset.bsParent = '#country-list';
+                if (isHashMatch) memberListElem.classList.add('show');
+
+                // Add event listeners to handle hash changes
+                memberListElem.addEventListener('hidden.bs.collapse', () => {
+                    if (window.location.hash.substr(1) === safeCountry) window.location.hash = '';
+                });
+                memberListElem.addEventListener('shown.bs.collapse', () => {
+                    if (window.location.hash.substr(1) !== safeCountry) {
+                        window.location.hash = safeCountry;
                     }
                 });
 
-                // Add event listeniner for 'shown.bs.collapse' to add hash to URL / select current country if matching
-                countryTemplate.querySelector('.member-list').addEventListener('shown.bs.collapse', function () {
-                    // if hash is not matching the country, add it
-                    if (window.location.hash.substr(1) != safe_country) {
-                        window.location.hash = safe_country;
-                    }
-                });
-
-                members_by_country[country].forEach(function (member) {
+                membersByCountry[country].forEach(function (member) {
                     var memberTemplate = document.getElementById('member-template').content.cloneNode(true);
-                    if (member.hasOwnProperty('fullName')) {
+
+                    if (member.fullName) {
                         member.fullName.forEach(function (name) {
                             var name_container = document.createElement('span');
                             name_container.appendChild(document.createTextNode(name));
@@ -607,7 +615,7 @@
                         });
                     }
 
-                    if (member.hasOwnProperty('politicalGroup')) {
+                    if (member.politicalGroup) {
                         member.politicalGroup.forEach(function (name) {
                             var name_container = document.createElement('div');
                             name_container.appendChild(document.createTextNode(name));
@@ -617,7 +625,7 @@
                         });
                     }
 
-                    if (member.hasOwnProperty('nationalPoliticalGroup')) {
+                    if (member.nationalPoliticalGroup) {
                         member.nationalPoliticalGroup.forEach(function (name) {
                             var name_container = document.createElement('div');
                             // add col-9 class
@@ -628,27 +636,16 @@
                         });
                     }
 
-                    if (member.hasOwnProperty('contact_data')) {
-                        for (const [contactType, contactItem] of Object.entries(member.contact_data)) {
-                            var contactTemplate = document.getElementById('contact-template').content.cloneNode(true);
-                            if (contactMap.hasOwnProperty(contactType)) {
-                                var contactIcon = contactMap[contactType].icon;
-                                var contactTypeTitle = contactMap[contactType].title;
-                                var contactDetail = contactMap[contactType].transform(contactItem)
-                            } else {
-                                var contactIcon = 'question';
-                                var contactTypeTitle = contactType;
-                                var contactDetail = contactItem;
-                            }
-                            contactTemplate.querySelector('.contact-icon').classList.add('bi-' + contactIcon);
-                            // contactTemplate.querySelector('.contact-type').innerText = contactTypeTitle;
-                            contactTemplate.querySelector('.contact-detail').innerHTML = contactDetail;
+                    if (member.contact_data) {
+                        Object.entries(member.contact_data).forEach(([contactType, contactItem]) => {
+                            const contactTemplate = document.getElementById('contact-template').content.cloneNode(true);
+                            const { icon, detail } = createContactDetail(contactType, contactItem);
+                            contactTemplate.querySelector('.contact-icon').classList.add(`bi-${icon}`);
+                            contactTemplate.querySelector('.contact-detail').innerHTML = detail;
                             memberTemplate.querySelector('.member-contacts').appendChild(contactTemplate);
-                        }
-
-                    } else {
-                        // no eContact??
+                        });
                     }
+
                     if (member.hasOwnProperty('address')) {
                         member.address.forEach(function (contact) {
                             if (contact.hasOwnProperty('phone')) {
@@ -662,9 +659,9 @@
 
                         });
                     }
-                    countryTemplate.querySelector('.member-cards').appendChild(memberTemplate);
+                    memberListElem.querySelector('.member-cards').appendChild(memberTemplate);
                 });
-                countryList.appendChild(countryTemplate);
+                countryListEl.appendChild(countryTemplate);
 
             });
         }
@@ -674,8 +671,7 @@
             updateMetadata();
             updateMemberList();
         });
-        
+
     </script>
 </body>
-
 </html>

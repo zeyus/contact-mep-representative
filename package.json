@@ -10,7 +10,7 @@
   "license": "ISC",
   "dependencies": {
     "cheerio": "^1.1.2",
-    "follow-redirects": "^1.15.6",
+    "follow-redirects": "^1.15.11",
     "minimist": "^1.2.5",
     "xml2js": "^0.6.2"
   }

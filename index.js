@@ -15,7 +15,7 @@ const download = !argv.hasOwnProperty('no-download');
 const combine = !argv.hasOwnProperty('no-combine');
 
 // How long to wait in miliseconds beween downloads.
-const wait = argv.hasOwnProperty('combine') ? argv.hasOwnProperty('combine') : 300;
+const wait = argv.hasOwnProperty('delay-ms') ? parseInt(argv['delay-ms']) : 300;
 
 var alphasources = [];
 

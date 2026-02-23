@@ -207,8 +207,22 @@
     </template>
     <template id="contact-template">
         <li class="member-contact mt-3">
-            <!-- <div><span class="contact-type fw-bold"></span></div> -->
             <div class=""><span class="contact-icon"></span>&nbsp;<span class="contact-detail"></span></div>
+        </li>
+    </template>
+    <template id="office-contacts-template">
+        <ul class="member-office-contacts list-unstyled d-flex flex-row gap-3">
+
+        </ul>
+    </template>
+    <template id="office-contact-template">
+        <li class="member-contact mt-3 d-flex flex-column gap-1">
+            <!-- type is Brussels or Strasbourg -->
+            <div><span class="contact-type fw-bold"></span></div>
+            <!-- next is address -->
+            <div class="contact-address"></div>
+            <!-- then phone number -->
+            <div class="contact-phone"></div>
         </li>
     </template>
 
@@ -560,6 +574,15 @@
                         return raw;
                     }
                 },
+                phone: {
+                    icon: 'telephone',
+                    title: 'Phone',
+                    transform: function (raw) {
+                        // remove all non-digit characters for the href
+                        var tel = raw.replace(/\D/g, '');
+                        return '<a href="tel:' + tel + '">' + raw + '</a>';
+                    }
+                }
             };
 
             const { icon, transform } = contactMap[contactType] || { icon: 'question', transform: () => contactItem };
@@ -642,27 +665,36 @@
 
                     if (member.contact_data) {
                         Object.entries(member.contact_data).forEach(([contactType, contactItem]) => {
-                            const contactTemplate = document.getElementById('contact-template').content.cloneNode(true);
-                            const { icon, detail } = createContactDetail(contactType, contactItem);
-                            contactTemplate.querySelector('.contact-icon').classList.add(`bi-${icon}`);
-                            contactTemplate.querySelector('.contact-detail').innerHTML = detail;
-                            memberTemplate.querySelector('.member-contacts').appendChild(contactTemplate);
-                        });
-                    }
+                            // standard name => value
+                            if (contactType !== 'official_contacts') {
+                                const contactTemplate = document.getElementById('contact-template').content.cloneNode(true);
+                                const { icon, detail } = createContactDetail(contactType, contactItem);
+                                contactTemplate.querySelector('.contact-icon').classList.add(`bi-${icon}`);
+                                contactTemplate.querySelector('.contact-detail').innerHTML = detail;
+                                memberTemplate.querySelector('.member-contacts').appendChild(contactTemplate);
+                                // official_contacts is an array of objects with type (Brussels or Strasbourg, sometimes another), address and phone
+                            } else if (Array.isArray(contactItem)) {
+                                const officeContactsTemplate = document.getElementById('office-contacts-template').content.cloneNode(true);
+                                contactItem.forEach(item => {
+                                    const officeContactTemplate = document.getElementById('office-contact-template').content.cloneNode(true);
+                                    const phoneTemplate = document.getElementById('contact-template').content.cloneNode(true);
+                                    officeContactTemplate.querySelector('.contact-type').innerText = item.type;
+                                    officeContactTemplate.querySelector('.contact-address').innerText = item.address;
 
-                    if (member.hasOwnProperty('address')) {
-                        member.address.forEach(function (contact) {
-                            if (contact.hasOwnProperty('phone')) {
-                                contact.phone.forEach(function (phone) {
-                                    var contactTemplate = document.getElementById('contact-template').content.cloneNode(true);
-                                    contactTemplate.querySelector('.contact-type').innerText = 'Phone (' + contact.town[0] + ', ' + contact.country[0] + ')';
-                                    contactTemplate.querySelector('.contact-detail').innerText = phone;
-                                    memberTemplate.querySelector('.member-contacts').appendChild(contactTemplate);
+                                    if (item.phone) {
+                                        const { icon, detail } = createContactDetail('phone', item.phone);
+                                        phoneTemplate.querySelector('.contact-icon').classList.add(`bi-${icon}`);
+                                        phoneTemplate.querySelector('.contact-detail').innerHTML = detail;
+                                        officeContactTemplate.querySelector('.contact-phone').appendChild(phoneTemplate);
+                                    }
+
+                                    officeContactsTemplate.querySelector('.member-office-contacts').appendChild(officeContactTemplate);
                                 });
+                                memberTemplate.querySelector('.member-contacts').appendChild(officeContactsTemplate);
                             }
-
                         });
                     }
+
                     memberListElem.querySelector('.member-cards').appendChild(memberTemplate);
                 });
                 countryListEl.appendChild(countryTemplate);
@@ -678,4 +710,5 @@
 
     </script>
 </body>
+
 </html>

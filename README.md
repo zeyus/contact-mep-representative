@@ -9,6 +9,10 @@ https://www.zeyus.com/contact-mep-representative/
 
 I wanted to contact my European parliament representatives, and I noticed the website didn't make it easy and involved multiple clicks. Same with the data, it wasn't organised in a way to facilitate easily finding all the contact information for your country's representatives, so I wanted to make a very quick and dirty web based app to gather and consolidate the data and present it for easy access. That's all :)
 
+## Important note
+
+This is a fragile way to collect this information. It relies on document parsing based on the website structure. Of course if any changes are made to the site, this code might break, as it did today (2026-02-23), but thanksfully the wheels of government turn slowly so this shouldn't happen too often. If you want to help, or you notice any problems, please open an issue or a pull request.
+
 # Usage
 
 Either use the version available at: https://www.zeyus.com/contact-mep-representative/ or alternatively to use it locally:

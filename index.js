@@ -76,7 +76,7 @@ async function download_data_files() {
 
 function get_mep_contact_data(mep_id) {
     // get the MEP's contact data from the web
-    // these are stored in a DIV with the class "erpl_social-share-horizontal"
+    // these are stored in a DIV with the class "es_social-share-horizontal" (changed 2026-02-23)
     // and can contain the following elements (they also have other classes):
     // a.link_email : email address
     // a.link_twitt : twitter handle
@@ -99,13 +99,13 @@ function get_mep_contact_data(mep_id) {
                 // parse the HTML
                 let contact_data = {};
                 let $ = cheerio.load(data);
-                let social_links = $('.erpl_social-share-horizontal');
+                let social_links = $('.es_social-share-horizontal');
                 social_links.find('a').each(function (i, elem) {
                     let link = $(this);
                     let link_class = link.attr('class');
                     let link_href = link.attr('href');
                     if (link_class) {
-                        
+
                         if (link_class.indexOf('link_email') > -1) {
                             contact_data.email = link_href.replace('mailto:', '');
                         }
@@ -141,6 +141,31 @@ function get_mep_contact_data(mep_id) {
                 if (birth_place && birth_place != '') {
                     contact_data.birth_place = birth_place.text();
                 }
+                let contacts_official = $('#contacts');
+
+                // Resolve official MEP contact (phone, address at the European Parliament)
+                // each is in a ".es_contact-card"
+                let official_contacts = [];
+                contacts_official.find('.es_contact-card').each(function (i, elem) {
+                    let contact_card = $(this);
+                    let contact = {};
+                    // this is e.g. "Brussels" or "Strasbourg"
+                    let contact_type = contact_card.find('.es_title-h3').text().trim();
+                    contact.type = contact_type;
+                    // the address is in a span, and has line breaks
+                    // there is also a span in the telephone <a> tag...ugh.
+                    let address = contact_card.find('.es_contact-card-list > span').first().html().trim();
+                    address = address.replace(/<br\s*\/?>/gi, '\n');
+                    contact.address = address;
+                    // the phone number is in an a tag with href starting with "tel:"
+                    let phone = contact_card.find('a[href^="tel:"]').attr('href');
+                    if (phone) {
+                        contact.phone = phone.replace('tel:', '');
+                    }
+                    official_contacts.push(contact);
+
+                });
+                contact_data.official_contacts = official_contacts;
                 console.log('Got contact data for MEP %d : %s', mep_id, contact_data);
                 resolve(contact_data);
             });
@@ -164,7 +189,7 @@ async function combine_data_files() {
         parser.parseString(xml_string, function (error, result) {
             if (error === null) {
                 if (result.meps.mep) {
-                    
+
                     result.meps.mep.forEach(function (member) {
                         let country = member.country[0];
                         if (!members_by_country[country]) {
